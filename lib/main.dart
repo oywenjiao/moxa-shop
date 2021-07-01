@@ -1,9 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:moxa_shop/common/c_colors.dart';
+import 'package:moxa_shop/pages/categorys.dart';
+import 'package:moxa_shop/pages/home.dart';
+import 'package:moxa_shop/pages/product_detail.dart';
 import 'package:moxa_shop/widgets/c_app_bar.dart';
 import 'package:moxa_shop/widgets/c_text.dart';
 
@@ -24,7 +25,13 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+
+  final Map<String, WidgetBuilder> routes = {
+    '/': (context) => HomePage(),
+    '/cate': (context, {arguments}) => CategorysPage(arguments: arguments),
+    '/product_detail': (context) => ProductDetailPage()
+  };
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -33,7 +40,69 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor:Colors.grey[50],  // 定义背景色
         primarySwatch: CColors.materialColor(Color(0xffFF9900)),  // 定义主题色
       ),
-      home: MyHomePage(title: 'Demo Home Page'),
+      home: Tabs(),
+      onGenerateRoute: (RouteSettings settings) {
+        final String? name = settings.name;
+        final Function? pageContentBuilder = this.routes[name];
+        if (pageContentBuilder != null) {
+          if (settings.arguments != null) {
+            final Route route = MaterialPageRoute(
+                builder: (context) => pageContentBuilder(context, arguments: settings.arguments)
+            );
+            return route;
+          } else {
+            final Route route = MaterialPageRoute(
+                builder: (context) => pageContentBuilder(context)
+            );
+            return route;
+          }
+        } else {
+          final Route route = MaterialPageRoute(
+              builder: (context) => pageContentBuilder(context)
+          );
+          return route;
+        }
+      }
+    );
+  }
+}
+
+class Tabs extends StatefulWidget {
+  @override
+  _TabsState createState() => _TabsState();
+}
+
+class _TabsState extends State<Tabs> {
+  int _currentIndex = 0;
+
+  List _pageList = [
+    HomePage(),
+    CategorysPage()
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body:_pageList[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        type: BottomNavigationBarType.fixed,
+        onTap: (int index) {
+          setState(() {
+            this._currentIndex = index;
+          });
+        },
+        items: [
+          BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: "首页"
+          ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.category),
+              label: "分类"
+          ),
+        ],
+      ),
     );
   }
 }
