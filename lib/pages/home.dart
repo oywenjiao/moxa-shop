@@ -1,132 +1,21 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:moxa_shop/common/c_colors.dart';
-import 'package:moxa_shop/pages/categorys.dart';
-import 'package:moxa_shop/pages/home.dart';
-import 'package:moxa_shop/pages/product_detail.dart';
 import 'package:moxa_shop/widgets/c_app_bar.dart';
 import 'package:moxa_shop/widgets/c_text.dart';
 
-void main() {
-  runApp(MyApp());
-  //沉浸式
-  SystemUiOverlayStyle style = SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    statusBarIconBrightness: Brightness.light,
-    systemNavigationBarIconBrightness: Brightness.light,
-  );
-  SystemChrome.setSystemUIOverlayStyle(style);
-  //强制竖屏
-  SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown
-  ]);
-}
-
-class MyApp extends StatelessWidget {
-
-  final Map<String, WidgetBuilder> routes = {
-    '/': (context) => HomePage(),
-    '/product_detail': (context) => ProductDetailPage()
-  };
-
+class HomePage extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,  // 关闭右上角debug角标
-      theme: ThemeData(
-        scaffoldBackgroundColor:Colors.grey[50],  // 定义背景色
-        primarySwatch: CColors.materialColor(Color(0xffFF9900)),  // 定义主题色
-      ),
-      home: Tabs(),
-      onGenerateRoute: (RouteSettings settings) {
-        final String? name = settings.name;
-        print('111');
-        print(this.routes);
-        final Function? pageContentBuilder = this.routes[name];
-        if (pageContentBuilder != null) {
-          if (settings.arguments != null) {
-            final Route route = MaterialPageRoute(
-                builder: (context) => pageContentBuilder(context, arguments: settings.arguments)
-            );
-            return route;
-          } else {
-            final Route route = MaterialPageRoute(
-                builder: (context) => pageContentBuilder(context)
-            );
-            return route;
-          }
-        } else {
-          final Route route = MaterialPageRoute(
-              builder: (context) => pageContentBuilder!(context)
-          );
-          return route;
-        }
-      }
-    );
-  }
+  _HomePageState createState() => _HomePageState();
 }
 
-class Tabs extends StatefulWidget {
-  @override
-  _TabsState createState() => _TabsState();
-}
-
-class _TabsState extends State<Tabs> {
-  int _currentIndex = 0;
-
-  List _pageList = [
-    HomePage(),
-    CategorysPage()
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body:_pageList[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        type: BottomNavigationBarType.fixed,
-        onTap: (int index) {
-          setState(() {
-            this._currentIndex = index;
-          });
-        },
-        items: [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: "首页"
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.category),
-              label: "分类"
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin
+{
   String searchKey = '';
 
   TextEditingController _controller = TextEditingController();
 
-
   @override
   Widget build(BuildContext context) {
-    print(169/205);
     return Scaffold(
       appBar: CAppBar(
         title: SizedBox(
@@ -139,7 +28,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Container(
                   height: double.infinity,
                   decoration: BoxDecoration(
-                    color: CColors.materialColor(Color(0xffFF9900)), borderRadius: BorderRadius.circular(4)
+                      color: CColors.materialColor(Color(0xffFF9900)), borderRadius: BorderRadius.circular(4)
                   ),
                   child: TextField(
                     controller: _controller,
@@ -165,15 +54,15 @@ class _MyHomePageState extends State<MyHomePage> {
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(borderSide: BorderSide.none),
-                      suffixIcon: searchKey.length > 0 ? IconButton(
-                        onPressed: () {
-                          setState(() {
-                            searchKey = '';
-                          });
-                          _controller.clear();
-                        },
-                        icon: Icon(Icons.cancel, color: CColors.materialColor(Color(0xff888888))),
-                      ) : null
+                        suffixIcon: searchKey.length > 0 ? IconButton(
+                          onPressed: () {
+                            setState(() {
+                              searchKey = '';
+                            });
+                            _controller.clear();
+                          },
+                          icon: Icon(Icons.cancel, color: CColors.materialColor(Color(0xff888888))),
+                        ) : null
                     ),
                   ),
                 ),
@@ -191,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
               margin: EdgeInsets.only(top: 10.0, left: 12.0, right: 12.0,),
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: Colors.white
+                  color: Colors.white
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -274,24 +163,25 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   SizedBox(height: 22.0,),
                   GridView.builder(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        //纵轴间距
-                        mainAxisSpacing: 2,
-                        //横轴间距
-                        crossAxisSpacing: 13.0,
-                        //子组件宽高长度比例
-                        childAspectRatio: 169/218,
-                      ),
-                      itemCount: 20,
-                      itemBuilder: (context, index) {
-                        return Container(
-                          alignment: Alignment.center,
-                          child: InkWell(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      //纵轴间距
+                      mainAxisSpacing: 2,
+                      //横轴间距
+                      crossAxisSpacing: 13.0,
+                      //子组件宽高长度比例
+                      childAspectRatio: 169/218,
+                    ),
+                    itemCount: 20,
+                    itemBuilder: (context, index) {
+                      return Container(
+                        alignment: Alignment.center,
+                        child: InkWell(
                             onTap: () async{
                               print('路由跳转');
+                              Navigator.pushNamed(context, '/product_detail');
                             },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -312,9 +202,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                               ],
                             )
-                          ),
-                        );
-                      }
+                        ),
+                      );
+                    }
                   ),
                 ],
               ),
