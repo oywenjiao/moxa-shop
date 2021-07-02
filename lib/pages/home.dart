@@ -1,7 +1,12 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:moxa_shop/common/c_colors.dart';
 import 'package:moxa_shop/widgets/c_app_bar.dart';
 import 'package:moxa_shop/widgets/c_text.dart';
+import 'package:uni_links/uni_links.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -13,6 +18,50 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin
   String searchKey = '';
 
   TextEditingController _controller = TextEditingController();
+
+
+  StreamSubscription? _sub;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print('进入这里吗');
+    _handleIncomingLinks();
+    _initPlatformState();
+  }
+
+  void _handleIncomingLinks() {
+    if (!kIsWeb) {
+      _sub = uriLinkStream.listen((Uri? uri) {
+        if (!mounted) return;
+        print('got uri: $uri');
+      }, onError: (Object err) {
+        if (!mounted) return;
+        print('got err: $err');
+      });
+    }
+  }
+
+  Future<void> _initPlatformState() async{
+    print('外部打开');
+    try {
+      final uri = await getInitialLink();
+      if (uri == null) {
+        print('no initial uri');
+      } else {
+        print('got initial uri: $uri');
+      }
+      if (!mounted) return;
+    } on PlatformException {
+      // Platform messages may fail but we ignore the exception
+      print('falied to get initial uri');
+    } on FormatException catch (err) {
+      if (!mounted) return;
+      print('malformed initial uri');
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -88,15 +137,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin
                 children: [
                   Expanded(
                     flex: 1,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset("images/home-menu-icon1.png", width: 46.0, height: 46.0,),
-                        Padding(
-                          padding: EdgeInsets.only(top: 4.0),
-                          child: CText("Discount", fontSize: 11.0, color: Color(0xff555555),),
-                        )
-                      ],
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/user/order');
+                      },
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset("images/home-menu-icon1.png", width: 46.0, height: 46.0,),
+                          Padding(
+                            padding: EdgeInsets.only(top: 4.0),
+                            child: CText("Discount", fontSize: 11.0, color: Color(0xff555555),),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                   Expanded(
@@ -181,7 +235,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin
                         child: InkWell(
                             onTap: () async{
                               print('路由跳转');
-                              Navigator.pushNamed(context, '/product_detail');
+                              Navigator.pushNamed(context, '/product/detail');
                             },
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,

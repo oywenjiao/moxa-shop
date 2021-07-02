@@ -1,12 +1,18 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:moxa_shop/common/c_colors.dart';
 import 'package:moxa_shop/pages/categorys.dart';
 import 'package:moxa_shop/pages/home.dart';
-import 'package:moxa_shop/pages/product_detail.dart';
+import 'package:moxa_shop/pages/product/product_detail.dart';
+import 'package:moxa_shop/routes/product.dart';
+import 'package:moxa_shop/routes/user.dart';
 import 'package:moxa_shop/widgets/c_app_bar.dart';
 import 'package:moxa_shop/widgets/c_text.dart';
+import 'package:uni_links/uni_links.dart';
 
 void main() {
   runApp(MyApp());
@@ -26,13 +32,17 @@ void main() {
 
 class MyApp extends StatelessWidget {
 
-  final Map<String, WidgetBuilder> routes = {
-    '/': (context) => HomePage(),
-    '/product_detail': (context) => ProductDetailPage()
-  };
+  // final Map<String, WidgetBuilder> routes = {
+  //   '/': (context) => HomePage(),
+  //   '/product_detail': (context) => ProductDetailPage()
+  // };
 
   @override
   Widget build(BuildContext context) {
+    Map routes = {};
+    routes.addAll(productRoutes(context));
+    routes.addAll(userRoutes(context));
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,  // 关闭右上角debug角标
       theme: ThemeData(
@@ -43,8 +53,8 @@ class MyApp extends StatelessWidget {
       onGenerateRoute: (RouteSettings settings) {
         final String? name = settings.name;
         print('111');
-        print(this.routes);
-        final Function? pageContentBuilder = this.routes[name];
+        print(routes);
+        final Function? pageContentBuilder = routes[name];
         if (pageContentBuilder != null) {
           if (settings.arguments != null) {
             final Route route = MaterialPageRoute(
@@ -123,6 +133,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   TextEditingController _controller = TextEditingController();
 
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print('初始化成功!');
+  }
 
   @override
   Widget build(BuildContext context) {
